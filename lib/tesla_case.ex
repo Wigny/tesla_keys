@@ -21,6 +21,8 @@ defmodule TeslaCase.Middleware do
 
   @behaviour Tesla.Middleware
 
+  defguardp is_enum(data) when is_map(data) or is_list(data)
+
   @impl true
   def call(env, next, opts) do
     serializer = Keyword.get(opts, :serializer, &Recase.Enumerable.stringify_keys/2)
@@ -33,26 +35,22 @@ defmodule TeslaCase.Middleware do
     |> response(serializer, decode)
   end
 
-  defp request(%{body: nil} = env, _serializer, _encode) do
-    env
-  end
-
-  defp request(%{body: body} = env, serializer, encode) do
+  defp request(%{body: body} = env, serializer, encode) when is_enum(body) do
     %{env | body: converter(body, serializer, encode)}
   end
 
-  defp response({:ok, %{body: nil}} = env, _serializer, _decode) do
+  defp request(env, _serializer, _encode) do
     env
   end
 
-  defp response({:ok, env}, serializer, decode) do
-    env = Map.update!(env, :body, &converter(&1, serializer, decode))
+  defp response({:ok, env}, serializer, decode) when is_enum(env.body) do
+    env = %{env | body: converter(env.body, serializer, decode)}
 
     {:ok, env}
   end
 
-  defp response({:error, error}, _serializer, _decode) do
-    {:error, error}
+  defp response(env, _serializer, _decode) do
+    env
   end
 
   defp converter(data, serializer, converter) do

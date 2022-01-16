@@ -23,7 +23,7 @@ defmodule TeslaCaseTest do
 
   describe "converts request body" do
     test "to camel case", %{client: client} do
-      Tesla.get(client, "/request", body: %{request_body: "ok"})
+      Tesla.get(client, "/request", body: %{foo_bar: "ok"})
 
       assert_received %{body: %{"fooBar" => "ok"}}
     end
