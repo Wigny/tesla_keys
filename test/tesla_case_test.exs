@@ -1,8 +1,49 @@
 defmodule TeslaCaseTest do
   use ExUnit.Case
-  doctest TeslaCase
+  # doctest TeslaCase
 
-  test "greets the world" do
-    assert TeslaCase.hello() == :world
+  setup context do
+    middlewares = [{TeslaCase.Middleware, Map.get(context, :opts, [])}]
+
+    adapter = fn env ->
+      case env.url do
+        "/request" ->
+          send(self(), env)
+          {:ok, %Tesla.Env{}}
+
+        "/response" ->
+          {:ok, %Tesla.Env{body: %{"fooBar" => "ok"}}}
+      end
+    end
+
+    client = Tesla.client(middlewares, &then(&1, adapter))
+
+    %{client: client}
+  end
+
+  describe "converts request body" do
+    test "to camel case", %{client: client} do
+      Tesla.get(client, "/request", body: %{foo_bar: "ok"})
+
+      assert_received %{body: %{"fooBar" => "ok"}}
+    end
+
+    @tag opts: [converter: &Recase.to_pascal/1]
+    test "to a custom case", %{client: client} do
+      Tesla.get(client, "/request", body: %{foo_bar: "ok"})
+
+      assert_received %{body: %{"FooBar" => "ok"}}
+    end
+  end
+
+  describe "converts response body" do
+    test "to snake case", %{client: client} do
+      assert {:ok, %{body: %{"foo_bar" => "ok"}}} = Tesla.get(client, "/response")
+    end
+
+    @tag opts: [serializer: :atomize_keys]
+    test "to snake case atomizing", %{client: client} do
+      assert {:ok, %{body: %{foo_bar: "ok"}}} = Tesla.get(client, "/response")
+    end
   end
 end
