@@ -1,6 +1,6 @@
 defmodule TeslaCaseTest do
   use ExUnit.Case
-  # doctest TeslaCase
+  doctest TeslaCase.Middleware
 
   setup context do
     middlewares = [{TeslaCase.Middleware, Map.get(context, :opts, [])}]
@@ -23,12 +23,12 @@ defmodule TeslaCaseTest do
 
   describe "converts request body" do
     test "to camel case", %{client: client} do
-      Tesla.get(client, "/request", body: %{foo_bar: "ok"})
+      Tesla.get(client, "/request", body: %{request_body: "ok"})
 
       assert_received %{body: %{"fooBar" => "ok"}}
     end
 
-    @tag opts: [converter: &Recase.to_pascal/1]
+    @tag opts: [encode: &Recase.to_pascal/1]
     test "to a custom case", %{client: client} do
       Tesla.get(client, "/request", body: %{foo_bar: "ok"})
 
@@ -41,7 +41,7 @@ defmodule TeslaCaseTest do
       assert {:ok, %{body: %{"foo_bar" => "ok"}}} = Tesla.get(client, "/response")
     end
 
-    @tag opts: [serializer: :atomize_keys]
+    @tag opts: [serializer: &Recase.Enumerable.atomize_keys/2]
     test "to snake case atomizing", %{client: client} do
       assert {:ok, %{body: %{foo_bar: "ok"}}} = Tesla.get(client, "/response")
     end

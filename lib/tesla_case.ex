@@ -1,46 +1,61 @@
 defmodule TeslaCase.Middleware do
   @moduledoc """
-  Documentation for `TeslaCase`.
-  """
+  Tesla middleware for converting the body keys of the request and response.
+  This middleware will convert all keys from the body of the request using the appropriate
+  function before performing it and will convert all keys from the body of the response to
+  snake case.
 
-  alias Recase.Enumerable
+  ## Examples
+  ```
+  defmodule MyClient do
+    use Tesla
+    plug TeslaCase.Middleware # use defaults
+    # or
+    plug TeslaCase.Middleware, encode: &Recase.to_camel/1, serializer: &Recase.Enumerable.stringify_keys/2
+  end
+  ```
+  ## Options
+  - `:serializer` - serializer function with arity 2, receives the data as the first parameter and the `:encode` as the second parameter, (defaults to `&Recase.Enumerable.stringify_keys/2`)
+  - `:encode` - encoding function, e.g `&Recase.to_camel/1`, `&Recase.to_pascal/1` (defaults to `&Recase.to_camel/1`)
+  """
 
   @behaviour Tesla.Middleware
 
   @impl true
   def call(env, next, opts) do
-    serializer = Keyword.get(opts, :serializer, :stringify_keys)
-    converter = Keyword.get(opts, :converter, &Recase.to_camel/1)
+    serializer = Keyword.get(opts, :serializer, &Recase.Enumerable.stringify_keys/2)
+    encode = Keyword.get(opts, :encode, &Recase.to_camel/1)
+    decode = &Recase.to_snake/1
 
     env
-    |> request(serializer, converter)
+    |> request(serializer, encode)
     |> Tesla.run(next)
-    |> response(serializer, &Recase.to_snake/1)
+    |> response(serializer, decode)
   end
 
-  defp request(%{body: nil} = env, _serializer, _converter) do
+  defp request(%{body: nil} = env, _serializer, _encode) do
     env
   end
 
-  defp request(%{body: body} = env, serializer, converter) do
-    %{env | body: converter(body, serializer, converter)}
+  defp request(%{body: body} = env, serializer, encode) do
+    %{env | body: converter(body, serializer, encode)}
   end
 
-  defp response({:ok, %{body: nil}} = env, _serializer, _converter) do
+  defp response({:ok, %{body: nil}} = env, _serializer, _decode) do
     env
   end
 
-  defp response({:ok, env}, serializer, converter) do
-    env = Map.update!(env, :body, &converter(&1, serializer, converter))
+  defp response({:ok, env}, serializer, decode) do
+    env = Map.update!(env, :body, &converter(&1, serializer, decode))
 
     {:ok, env}
   end
 
-  defp response({:error, error}, _serializer, _converter) do
+  defp response({:error, error}, _serializer, _decode) do
     {:error, error}
   end
 
   defp converter(data, serializer, converter) do
-    apply(Enumerable, serializer, [data, converter])
+    apply(serializer, [data, converter])
   end
 end
