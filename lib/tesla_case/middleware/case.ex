@@ -28,7 +28,7 @@ defmodule TeslaCase.Middleware.Case do
 
   @behaviour Tesla.Middleware
 
-  defguardp is_enum(data) when is_map(data) or is_list(data)
+  import TeslaCase, only: :macros
 
   @impl true
   def call(env, next, opts) do

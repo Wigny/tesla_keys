@@ -1,22 +1,22 @@
 defmodule TeslaCase.Middleware.CaseTest do
   use ExUnit.Case
-  doctest TeslaCase.Middleware.Case
+  alias TeslaCase.Middleware.Case
+  doctest Case
 
   setup context do
-    middlewares = [{TeslaCase.Middleware.Case, Map.get(context, :opts, [])}]
+    middlewares = [{Case, Map.get(context, :opts, [])}]
 
-    adapter = fn env ->
-      case env.url do
-        "/request" ->
-          send(self(), env)
-          {:ok, %Tesla.Env{}}
+    client =
+      Tesla.client(middlewares, fn env ->
+        case env.url do
+          "/request" ->
+            send(self(), env)
+            {:ok, %Tesla.Env{}}
 
-        "/response" ->
-          {:ok, %Tesla.Env{body: %{"fooBar" => "ok"}}}
-      end
-    end
-
-    client = Tesla.client(middlewares, &then(&1, adapter))
+          "/response" ->
+            {:ok, %Tesla.Env{body: %{"fooBar" => "ok"}}}
+        end
+      end)
 
     %{client: client}
   end
