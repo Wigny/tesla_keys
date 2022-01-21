@@ -1,8 +1,10 @@
 defmodule TeslaKeys.Middleware.Remapper do
   @moduledoc """
-  Tesla Middleware for remapping the body keys of the request and response.
-  This middlware will convert all the keys of the body by their respective relation defined in the
-  options before sending the request and after receiving the response
+  Tesla middleware for remapping request and response body keys.
+
+  This middleware will remap the body keys by their respective relations defined in the options
+  before sending the request and after receiving the response. All unmapped keys will be kept as
+  is when doing the convertion.
 
   ## Examples
   ```
@@ -14,6 +16,13 @@ defmodule TeslaKeys.Middleware.Remapper do
       "bar" => "foo",
       "bye" => "hey"
     }
+    # or if you are working with atom keys map
+    plug TeslaKeys.Middleware.Remapper, keys: [
+      # "key expected by API": :"key you want to handle instead"
+      pong: :ping,
+      bar: :foo,
+      bye: :hey
+    ]
   end
   ```
   ## Options
@@ -60,7 +69,7 @@ defmodule TeslaKeys.Middleware.Remapper do
     Enum.map(value, &converter(&1, keys, action))
   end
 
-  defp converter(value, _keys, _encode) do
+  defp converter(value, _keys, _action) do
     value
   end
 

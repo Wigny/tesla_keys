@@ -9,6 +9,7 @@ defmodule TeslaKeys.MixProject do
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
+      docs: docs(),
       deps: deps()
     ]
   end
@@ -23,7 +24,7 @@ defmodule TeslaKeys.MixProject do
     [
       {:tesla, "~> 1.0"},
       {:recase, "~> 0.7"},
-      {:ex_doc, "~> 0.27", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
@@ -35,6 +36,14 @@ defmodule TeslaKeys.MixProject do
     [
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/wigny/tesla_keys"}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: Path.wildcard("guides/*") ++ ["README.md": [title: "Overview"]],
+      groups_for_extras: [guides: ~r/guides/],
+      main: "readme"
     ]
   end
 end

@@ -1,9 +1,9 @@
 defmodule TeslaKeys.Middleware.Case do
   @moduledoc """
-  Tesla middleware for converting the request and response body keys.
-  This middleware will convert all the keys from the request body using the function defined in
-  the options before executing the request, and will convert all the keys from the response body
-  using the function defined in options after getting the response
+  Tesla middleware for case conversion of request and response body keys.
+
+  This middleware will do the case conversion of body keys using the functions defined in
+  the options before sending the request and after receiving the response.
 
   ## Examples
   ```
@@ -15,13 +15,13 @@ defmodule TeslaKeys.Middleware.Case do
     # or
     plug TeslaKeys.Middleware.Case, encoder: &String.upcase/1, serializer: &serializer/2
 
-    defp serializer(data, encoder) when is_map(data), do: Map.new(data, fn {key, value} -> {then(key, encoder), value} end)
-    defp serializer(data, encoder) when is_list(data), do: Enum.map(data, &serializer(&1, encoder))
-    defp serializer(data, _encoder), do: data
+    defp serializer(data, fun) when is_map(data), do: Map.new(data, fn {key, value} -> {then(key, fun), value} end)
+    defp serializer(data, fun) when is_list(data), do: Enum.map(data, &serializer(&1, fun))
+    defp serializer(data, _fun), do: data
   end
   ```
   ## Options
-  - `:serializer` - serializer function with arity 2, receives the data as the first parameter and the `:encoder` as the second parameter, (defaults to `&Recase.Enumerable.stringify_keys/2`)
+  - `:serializer` - serializer function with arity 2, receives the body data as the first parameter and the `:encoder` or `:decoder` option as the second parameter, (defaults to `&Recase.Enumerable.stringify_keys/2`)
   - `:encoder` - encoding function, e.g `&Recase.to_camel/1`, `&Recase.to_pascal/1` (defaults to `&Recase.to_camel/1`)
   - `:decoder` - decoding function (defaults to `&Recase.to_snake/1`)
   """
@@ -60,7 +60,5 @@ defmodule TeslaKeys.Middleware.Case do
     env
   end
 
-  defp converter(data, serializer, converter) do
-    apply(serializer, [data, converter])
-  end
+  defp converter(data, serializer, converter), do: apply(serializer, [data, converter])
 end

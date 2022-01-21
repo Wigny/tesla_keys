@@ -1,0 +1,73 @@
+# Usage
+
+## Setup
+
+First of all, we need to install `tesla_keys` and all dependencies to work with `tesla`:
+
+```elixir
+Mix.install(~w[tesla tesla_keys jason]a)
+```
+
+## Using
+
+Let's create an HTTP client to consume the `{JSON} Placeholder` fake API. To learn more about it, see the [guide](https://jsonplaceholder.typicode.com/guide).
+
+```elixir
+defmodule Client do
+  use Tesla
+
+  plug Tesla.Middleware.BaseUrl, "https://jsonplaceholder.typicode.com/"
+  # middleware for remapping request and response body keys
+  plug TeslaKeys.Middleware.Remapper, keys: [body: :content]
+  # middleware for case conversion of the request and response body keys
+  plug TeslaKeys.Middleware.Case, serializer: &Recase.Enumerable.atomize_keys/2
+  plug Tesla.Middleware.Logger
+  plug Tesla.Middleware.PathParams
+  plug Tesla.Middleware.JSON
+
+  def list_posts() do
+    get("/posts")
+  end
+
+  def update_post(id, body) do
+    params = [id: id]
+    put("/posts/:id", body, opts: [path_params: params])
+  end
+end
+```
+
+In the example above, the `{JSON} Placeholder` expects the post body to have the following structure:
+
+```json
+{
+  "id": 1,
+  "title": "...",
+  "body": "...",
+  "userId": 1
+}
+```
+
+But when we use the TeslaKeys plugs to handle our request and response, we make some changes to the body data along the way, getting the following structure relative to the previous one:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+%{
+  id: 1,
+  title: "...",
+  content: "...",
+  user_id: 1
+}
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+So if you run the following request, everything works as expected:
+
+```elixir
+params = %{title: "foo", content: "bar", user_id: 1}
+
+with {:ok, %{body: body}} <- Client.update_post(1, params) do
+  body
+end
+```
