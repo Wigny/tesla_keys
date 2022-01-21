@@ -7,19 +7,13 @@ defmodule TeslaKeys do
   defmodule MyClient do
     use Tesla
 
-    plug TeslaKeys.Middleware.Case,
-      encoder: &Recase.to_camel/1,
-      serializer: &Recase.Enumerable.atomize_keys/2
-
-    plug TeslaKeys.Middleware.Remapper, keys: %{"body" => "content"}
+    plug Tesla.Middleware.BaseUrl, "https://jsonplaceholder.typicode.com/"
+    plug TeslaKeys.Middleware.Remapper, keys: [body: :content]
+    plug TeslaKeys.Middleware.Case, encoder: &Recase.to_camel/1, serializer: &Recase.Enumerable.atomize_keys/2
     plug Tesla.Middleware.JSON
   end
 
-  MyClient.put("https://jsonplaceholder.typicode.com/posts/1", %{
-    title: "foo",
-    content: "bar",
-    user_id: 1
-  })
+  MyClient.put("/posts/1", %{title: "foo", content: "bar", user_id: 1})
   ```
   """
 

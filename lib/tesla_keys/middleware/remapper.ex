@@ -26,7 +26,7 @@ defmodule TeslaKeys.Middleware.Remapper do
 
   @impl true
   def call(env, next, opts) do
-    keys = Keyword.get(opts, :keys, %{})
+    keys = opts |> Keyword.get(:keys, []) |> Map.new()
 
     env
     |> request(keys)
@@ -52,16 +52,8 @@ defmodule TeslaKeys.Middleware.Remapper do
     env
   end
 
-  defp converter(body, keys, :encode) when is_map(body) do
-    Map.new(body, fn {k, v} ->
-      {key, _} = Enum.find(keys, {k, nil}, fn {_, r} -> r == k end)
-
-      {key, converter(v, keys, :encode)}
-    end)
-  end
-
-  defp converter(body, keys, :decode) when is_map(body) do
-    Map.new(body, fn {k, v} -> {keys[k] || k, converter(v, keys, :decode)} end)
+  defp converter(value, keys, action) when is_map(value) do
+    Map.new(value, fn {k, v} -> {fetch(k, keys, action), converter(v, keys, action)} end)
   end
 
   defp converter(value, keys, action) when is_list(value) do
@@ -70,5 +62,15 @@ defmodule TeslaKeys.Middleware.Remapper do
 
   defp converter(value, _keys, _encode) do
     value
+  end
+
+  defp fetch(key, keys, :encode) do
+    keys
+    |> Enum.find({key, nil}, &match?({_, ^key}, &1))
+    |> elem(0)
+  end
+
+  defp fetch(key, keys, :decode) do
+    Map.get(keys, key, key)
   end
 end

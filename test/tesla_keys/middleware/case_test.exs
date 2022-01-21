@@ -28,7 +28,7 @@ defmodule TeslaKeys.Middleware.CaseTest do
       assert_received %{body: %{"fooBar" => "ok"}}
     end
 
-    @tag opts: [encode: &Recase.to_pascal/1]
+    @tag opts: [encoder: &Recase.to_pascal/1]
     test "to a custom case", %{client: client} do
       Tesla.get(client, "/request", body: %{foo_bar: "ok"})
 
