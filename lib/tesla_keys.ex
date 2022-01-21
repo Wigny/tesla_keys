@@ -1,6 +1,6 @@
 defmodule TeslaKeys do
   @moduledoc """
-  Group middleware useful to manipulate body keys
+  Aggregate of useful middlewares to manipulate body keys
 
   ## Examples
   ```

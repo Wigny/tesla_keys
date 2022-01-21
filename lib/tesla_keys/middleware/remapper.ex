@@ -17,7 +17,7 @@ defmodule TeslaKeys.Middleware.Remapper do
   end
   ```
   ## Options
-  - `:keys` - list of keys expected by the API and that you want to handle
+  - `:keys` - relation of keys expected by the API and that you want to handle
   """
 
   @behaviour Tesla.Middleware

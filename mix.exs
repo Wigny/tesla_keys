@@ -22,19 +22,19 @@ defmodule TeslaKeys.MixProject do
   defp deps do
     [
       {:tesla, "~> 1.0"},
-      {:recase, "~> 0.7.0"},
-      {:ex_doc, "~> 0.27.3", only: :dev, runtime: false}
+      {:recase, "~> 0.7"},
+      {:ex_doc, "~> 0.27", only: :dev, runtime: false}
     ]
   end
 
   defp description do
-    "Group middleware useful to manipulate body keys"
+    "Aggregate of useful middlewares to manipulate body keys"
   end
 
   defp package do
     [
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/wigny/tesla_case"}
+      links: %{"GitHub" => "https://github.com/wigny/tesla_keys"}
     ]
   end
 end
