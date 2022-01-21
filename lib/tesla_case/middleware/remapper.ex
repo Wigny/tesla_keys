@@ -1,5 +1,24 @@
 defmodule TeslaCase.Middleware.Remapper do
-  @moduledoc false
+  @moduledoc """
+  Tesla Middleware for remapping the body keys of the request and response.
+  This middlware will convert all the keys of the body by their respective relation defined in the
+  options before sending the request and after receiving the response
+
+  ## Examples
+  ```
+  defmodule MyClient do
+    use Tesla
+    plug TeslaCase.Middleware.Remapper, keys: %{
+      # key expected by API => key you want to handle instead
+      "pong" => "ping",
+      "bar" => "foo",
+      "bye" => "hey"
+    }
+  end
+  ```
+  ## Options
+  - `:keys` - list of keys expected by the API and that you want to handle
+  """
 
   @behaviour Tesla.Middleware
 
