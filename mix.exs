@@ -1,10 +1,10 @@
-defmodule TeslaCase.MixProject do
+defmodule TeslaKeys.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :tesla_case,
-      version: "0.1.1",
+      app: :tesla_keys,
+      version: "0.1.2",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       description: description(),
@@ -28,7 +28,7 @@ defmodule TeslaCase.MixProject do
   end
 
   defp description do
-    "Tesla middleware for converting the body keys of the request and response"
+    "Group middleware useful to manipulate body keys"
   end
 
   defp package do

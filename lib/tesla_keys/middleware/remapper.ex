@@ -1,4 +1,4 @@
-defmodule TeslaCase.Middleware.Remapper do
+defmodule TeslaKeys.Middleware.Remapper do
   @moduledoc """
   Tesla Middleware for remapping the body keys of the request and response.
   This middlware will convert all the keys of the body by their respective relation defined in the
@@ -8,7 +8,7 @@ defmodule TeslaCase.Middleware.Remapper do
   ```
   defmodule MyClient do
     use Tesla
-    plug TeslaCase.Middleware.Remapper, keys: %{
+    plug TeslaKeys.Middleware.Remapper, keys: %{
       # key expected by API => key you want to handle instead
       "pong" => "ping",
       "bar" => "foo",
@@ -22,7 +22,7 @@ defmodule TeslaCase.Middleware.Remapper do
 
   @behaviour Tesla.Middleware
 
-  import TeslaCase, only: :macros
+  import TeslaKeys, only: :macros
 
   @impl true
   def call(env, next, opts) do

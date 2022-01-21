@@ -1,6 +1,6 @@
-defmodule TeslaCase.Middleware.RemapperTest do
+defmodule TeslaKeys.Middleware.RemapperTest do
   use ExUnit.Case
-  alias TeslaCase.Middleware.Remapper
+  alias TeslaKeys.Middleware.Remapper
   doctest Remapper
 
   setup context do

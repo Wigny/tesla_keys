@@ -1,6 +1,6 @@
-defmodule TeslaCase.Middleware.CaseTest do
+defmodule TeslaKeys.Middleware.CaseTest do
   use ExUnit.Case
-  alias TeslaCase.Middleware.Case
+  alias TeslaKeys.Middleware.Case
   doctest Case
 
   setup context do
