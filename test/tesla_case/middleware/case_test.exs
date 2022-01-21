@@ -1,9 +1,9 @@
-defmodule TeslaCaseTest do
+defmodule TeslaCase.Middleware.CaseTest do
   use ExUnit.Case
-  doctest TeslaCase.Middleware
+  doctest TeslaCase.Middleware.Case
 
   setup context do
-    middlewares = [{TeslaCase.Middleware, Map.get(context, :opts, [])}]
+    middlewares = [{TeslaCase.Middleware.Case, Map.get(context, :opts, [])}]
 
     adapter = fn env ->
       case env.url do

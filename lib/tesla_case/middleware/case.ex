@@ -1,4 +1,4 @@
-defmodule TeslaCase.Middleware do
+defmodule TeslaCase.Middleware.Case do
   @moduledoc """
   Tesla middleware for converting the body keys of the request and response.
   This middleware will convert all keys from the body of the request using the appropriate
@@ -9,11 +9,11 @@ defmodule TeslaCase.Middleware do
   ```
   defmodule MyClient do
     use Tesla
-    plug TeslaCase.Middleware # use defaults
+    plug TeslaCase.Middleware.Case # use defaults
     # or
-    plug TeslaCase.Middleware, encode: &Recase.to_camel/1, serializer: &Recase.Enumerable.atomize_keys/2
+    plug TeslaCase.Middleware.Case, encode: &Recase.to_camel/1, serializer: &Recase.Enumerable.atomize_keys/2
     # or
-    plug TeslaCase.Middleware, encode: &String.upcase/1, serializer: &serializer/2
+    plug TeslaCase.Middleware.Case, encode: &String.upcase/1, serializer: &serializer/2
 
     defp serializer(data, encode) do
       Map.new(data, fn {key, value} -> {then(key, encode), value} end)
