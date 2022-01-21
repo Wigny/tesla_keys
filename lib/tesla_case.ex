@@ -11,12 +11,19 @@ defmodule TeslaCase.Middleware do
     use Tesla
     plug TeslaCase.Middleware # use defaults
     # or
-    plug TeslaCase.Middleware, encode: &Recase.to_camel/1, serializer: &Recase.Enumerable.stringify_keys/2
+    plug TeslaCase.Middleware, encode: &Recase.to_camel/1, serializer: &Recase.Enumerable.atomize_keys/2
+    # or
+    plug TeslaCase.Middleware, encode: &String.upcase/1, serializer: &serializer/2
+
+    defp serializer(data, encode) do
+      Map.new(data, fn {key, value} -> {then(key, encode), value} end)
+    end
   end
   ```
   ## Options
   - `:serializer` - serializer function with arity 2, receives the data as the first parameter and the `:encode` as the second parameter, (defaults to `&Recase.Enumerable.stringify_keys/2`)
   - `:encode` - encoding function, e.g `&Recase.to_camel/1`, `&Recase.to_pascal/1` (defaults to `&Recase.to_camel/1`)
+  - `:decode` - decoding function (defaults to `&Recase.to_snake/1`)
   """
 
   @behaviour Tesla.Middleware
@@ -27,7 +34,7 @@ defmodule TeslaCase.Middleware do
   def call(env, next, opts) do
     serializer = Keyword.get(opts, :serializer, &Recase.Enumerable.stringify_keys/2)
     encode = Keyword.get(opts, :encode, &Recase.to_camel/1)
-    decode = &Recase.to_snake/1
+    decode = Keyword.get(opts, :decode, &Recase.to_snake/1)
 
     env
     |> request(serializer, encode)
