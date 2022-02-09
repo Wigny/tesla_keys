@@ -7,7 +7,7 @@
 First of all, we need to install `tesla_keys` and all dependencies to work with `tesla`:
 
 ```elixir
-Mix.install([:tesla, :jason, {:tesla_keys, "~> 0.1.3"}])
+Mix.install(~w[tesla jason tesla_keys]a)
 ```
 
 ## Using
@@ -38,7 +38,7 @@ defmodule Client do
 end
 ```
 
-In the example above, the `{JSON} Placeholder` expects the post body to have the following structure:
+In the example above, the `{JSON} Placeholder` expects the post body to have the following JSON structure:
 
 ```json
 {
@@ -67,33 +67,31 @@ But when we use the TeslaKeys plugs to handle our request and response, we make 
 That way, when we use `TeslaKeys.Middleware.Remapper` we are remapping the `body` key to `content` and when we use `TeslaKeys.Middleware.Case`, we are doing the case conversion.
 
 ```elixir
-params = %{"title" => "foo", "content" => "bar", "user_id" => 1}
+params = %{"title" => "TeslaKeys", "content" => "Manipulates body keys", "user_id" => 1}
 
 with {:ok, %{body: body}} <- Client.update_post(1, params) do
   body
 end
 ```
 
-When running the request above, we noticed that to satisfy the structure expected by the API, the request was sent as:
+When running the above request, we noticed that to satisfy the structure expected by the API, the request was converted when sent like:
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-%{"body" => "bar", "title" => "foo", "userId" => 1}
+# requested as:
+%{"title" => "TeslaKeys", "content" => "Manipulates body keys", "user_id" => 1}
+# converted to:
+%{"title" => "TeslaKeys", "body" => "Manipulates body keys", "userId" => 1}
 ```
 
-and it was responded by it as:
+but when responded, it was converted again to get the desired result:
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
-%{"body" => "bar", "id" => 1, "title" => "foo", "userId" => 1}
-```
-
-but we got the desired result:
-
-<!-- livebook:{"force_markdown":true} -->
-
-```elixir
-%{"content" => "bar", "id" => 1, "title" => "foo", "user_id" => 1}
+# responded as:
+%{"id" => 1, "title" => "TeslaKeys", "body" => "Manipulates body keys", "userId" => 1}
+# converted to:
+%{"id" => 1, "title" => "TeslaKeys", "content" => "Manipulates body keys", "user_id" => 1}
 ```
