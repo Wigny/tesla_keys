@@ -64,7 +64,7 @@ But when we use the TeslaKeys plugs to handle our request and response, we make 
 
 <!-- livebook:{"break_markdown":true} -->
 
-That way, when we use `TeslaKeys.Middleware.Remapper` we are remapping the `title` key to `content` and when we use `TeslaKeys.Middleware.Case`, we are doing the case conversion.
+That way, when we use `TeslaKeys.Middleware.Remapper` we are remapping the `body` key to `content` and when we use `TeslaKeys.Middleware.Case`, we are doing the case conversion.
 
 ```elixir
 params = %{"title" => "foo", "content" => "bar", "user_id" => 1}

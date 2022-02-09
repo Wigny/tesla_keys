@@ -4,8 +4,9 @@ defmodule TeslaKeys.MixProject do
   def project do
     [
       app: :tesla_keys,
-      version: "0.1.4",
+      version: "0.1.5",
       elixir: "~> 1.13",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
@@ -38,6 +39,9 @@ defmodule TeslaKeys.MixProject do
       links: %{"GitHub" => "https://github.com/wigny/tesla_keys"}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp docs do
     [
