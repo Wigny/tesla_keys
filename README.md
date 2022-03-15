@@ -9,7 +9,7 @@ The package can be installed by adding `tesla_keys` to your list of dependencies
 ```elixir
 def deps do
   [
-    {:tesla_keys, "~> 0.2"}
+    {:tesla_keys, "~> 0.3"}
   ]
 end
 ```
