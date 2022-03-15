@@ -23,14 +23,14 @@ defmodule TeslaKeys.Middleware.CaseTest do
 
   describe "converts request body" do
     test "to camel case", %{client: client} do
-      Tesla.get(client, "/request", body: %{foo_bar: "ok"})
+      Tesla.get(client, "/request", body: %{"foo_bar" => "ok"})
 
       assert_received %{body: %{"fooBar" => "ok"}}
     end
 
     @tag opts: [encoder: &Recase.to_pascal/1]
     test "to a custom case", %{client: client} do
-      Tesla.get(client, "/request", body: %{foo_bar: "ok"})
+      Tesla.get(client, "/request", body: %{"foo_bar" => "ok"})
 
       assert_received %{body: %{"FooBar" => "ok"}}
     end

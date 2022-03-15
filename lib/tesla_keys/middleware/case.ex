@@ -11,7 +11,7 @@ defmodule TeslaKeys.Middleware.Case do
     use Tesla
     plug TeslaKeys.Middleware.Case # use defaults
     # or
-    plug TeslaKeys.Middleware.Case, encoder: &Recase.to_camel/1, serializer: &Recase.Enumerable.atomize_keys/2
+    plug TeslaKeys.Middleware.Case, encoder: &Recase.to_camel/1, serializer: &Recase.Enumerable.convert_keys/2
     # or
     plug TeslaKeys.Middleware.Case, encoder: &String.upcase/1, serializer: &serializer/2
 
@@ -21,7 +21,7 @@ defmodule TeslaKeys.Middleware.Case do
   end
   ```
   ## Options
-  - `:serializer` - serializer function with arity 2, receives the body data as the first parameter and the `:encoder` or `:decoder` option as the second parameter, (defaults to `&Recase.Enumerable.stringify_keys/2`)
+  - `:serializer` - serializer function with arity 2, receives the body data as the first parameter and the `:encoder` or `:decoder` option as the second parameter, (defaults to `&Recase.Enumerable.convert_keys/2`)
   - `:encoder` - encoding function, e.g `&Recase.to_camel/1`, `&Recase.to_pascal/1` (defaults to `&Recase.to_camel/1`)
   - `:decoder` - decoding function (defaults to `&Recase.to_snake/1`)
   """
@@ -32,7 +32,7 @@ defmodule TeslaKeys.Middleware.Case do
 
   @impl true
   def call(env, next, opts) do
-    serializer = Keyword.get(opts, :serializer, &Recase.Enumerable.stringify_keys/2)
+    serializer = Keyword.get(opts, :serializer, &Recase.Enumerable.convert_keys/2)
     encoder = Keyword.get(opts, :encoder, &Recase.to_camel/1)
     decoder = Keyword.get(opts, :decoder, &Recase.to_snake/1)
 
